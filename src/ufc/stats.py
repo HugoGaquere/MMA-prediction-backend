@@ -4,8 +4,14 @@ fighters_name = pd.read_csv("ufc/data/stats/fighters_name.csv")
 fighter_stats = pd.read_csv("ufc/data/stats/fighters_name.csv")
 ufc_stats = pd.read_csv("ufc/data/stats/ufc_stats.csv")
 
+
 def get_fighters_name() -> list[dict]:
     return fighters_name.to_dict("records")
+
+
+def get_fighter_name(fighter_id) -> str:
+    return fighters_name[fighters_name["id"] == fighter_id]["fighter"].values[0]
+
 
 def get_fighter_data(fighter_id: int) -> list:
     all_data = _get_all_data(fighter_id)
@@ -17,9 +23,10 @@ def get_fighter_data(fighter_id: int) -> list:
 
 
 def _get_all_data(fighter_id: int):
-    fighter_name = fighters_name[fighters_name['id'] == fighter_id]['fighter'].values[0]
+    fighter_name = get_fighter_name(fighter_id)
     all_fights = ufc_stats[ufc_stats["fighter"] == fighter_name]
     return all_fights
+
 
 def _clean_columns(data):
     cleaned_data = data.drop(
@@ -41,6 +48,7 @@ def _clean_columns(data):
         ]
     )
     return cleaned_data
+
 
 def _compute_extra_features(df: pd.DataFrame) -> pd.DataFrame:
     # compute nb fights

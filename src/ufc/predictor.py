@@ -1,4 +1,5 @@
 from xgboost import XGBClassifier
+from ufc.stats import get_fighter_data, get_fighter_name
 
 class FightResultPredictor:
     def __init__(self) -> None:
@@ -9,10 +10,12 @@ class FightResultPredictor:
         xgb.load_model(model_path)
         return xgb
 
-    def predict_winner(self, fighter_data_1: list, fighter_data_2: list):
-        """
-        Probabilty that the fighter 1 win over fighter 2
-        """
-        data = [fighter_data_1 + fighter_data_2]
+    def predict_winner(self, fighter_id_1: int, fighter_id_2: int):
+        data = [get_fighter_data(fighter_id_1) + get_fighter_data(fighter_id_2)]
         preds = self.model.predict_proba(data).tolist()
-        return {'loose': preds[0][0], 'win': preds[0][1], }
+
+        return {
+            f'{get_fighter_name(fighter_id_1)}': preds[0][1],
+            f'{get_fighter_name(fighter_id_2)}': preds[0][0]
+        }
+    

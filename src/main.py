@@ -1,28 +1,27 @@
 from fastapi import FastAPI
 from ufc.predictor import FightResultPredictor
-from ufc import stats
+from ufc.stats import get_fighter_data, get_fighters_name
 
 app = FastAPI()
-_FightResultPredictor = FightResultPredictor()
+Predictor = FightResultPredictor()
 
 
-@app.get("/")
-def read_root() -> str:
-    return "Hello"
-
-@app.get("/predict")
+@app.get("/api/v1/predict")
 def read_predict(fighter_id_1: int, fighter_id_2: int):
-    data_1 = stats.get_fighter_data(fighter_id_1)
-    data_2 = stats.get_fighter_data(fighter_id_2)
-    result = _FightResultPredictor.predict_winner(data_1, data_2)
+    result = Predictor.predict_winner(fighter_id_1, fighter_id_2)
     return result
 
 
-@app.get("/fighters_name")
+@app.get("/api/v1/fighters_name")
 def read_fighters_name() -> list[dict]:
-    return stats.get_fighters_name()
+    return get_fighters_name()
 
 
-@app.get("/fighter_stats/{fighter_id}")
-def read_fighter_stats(fighter_id: int):
-    return stats.get_fighter_data(fighter_id)
+@app.get("/api/v1/fighter_data/{fighter_id}")
+def read_fighter_data(fighter_id: int):
+    return get_fighter_data(fighter_id)
+
+
+@app.get("/api/v1/model_accuracy")
+def read_model_accuracy(fighter_id: int):
+    return {"accuracy": 0.78}
