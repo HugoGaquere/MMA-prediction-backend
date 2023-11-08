@@ -1,22 +1,28 @@
 from fastapi import FastAPI
-from predictor import predictor
+from ufc.predictor import FightResultPredictor
+from ufc import stats
 
 app = FastAPI()
-FightResultPredictor = predictor.FightResultPredictor()
-UFCStats = predictor.UFCStats()
+_FightResultPredictor = FightResultPredictor()
 
 
 @app.get("/")
-def read_root() -> dict:
-    return FightResultPredictor.predict_winner("fighter 1", "fighter 2")
+def read_root() -> str:
+    return "Hello"
+
+@app.get("/predict")
+def read_predict(fighter_id_1: int, fighter_id_2: int):
+    data_1 = stats.get_fighter_data(fighter_id_1)
+    data_2 = stats.get_fighter_data(fighter_id_2)
+    result = _FightResultPredictor.predict_winner(data_1, data_2)
+    return result
 
 
 @app.get("/fighters_name")
-def read_fighters_name() -> list:
-    return UFCStats.get_fighters_name()
+def read_fighters_name() -> list[dict]:
+    return stats.get_fighters_name()
 
 
-@app.get("/fighter_stats")
-def read_fighter_stats() -> dict:
-    fighter_name = UFCStats.get_fighters_name()[0]
-    return UFCStats.get_fighter_data(fighter_name)
+@app.get("/fighter_stats/{fighter_id}")
+def read_fighter_stats(fighter_id: int):
+    return stats.get_fighter_data(fighter_id)
